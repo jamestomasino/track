@@ -159,26 +159,25 @@ main () {
   fi
 
   if [ ${flag_remove} -gt 0 ]; then
-    rm "${TRACK_DIR}/${arg_remove}"
+    rm "${TRACK_DIR}/${arg_remove}.csv"
   fi
 
   if [ "${arg_metric}" != "" ]; then
-    file="${TRACK_DIR}/${arg_metric}.csv"
+    f="${TRACK_DIR}/${arg_metric}.csv"
 
     # If new file, add header
-    if [ ! -f "$file" ]; then
-      printf "year,month,day,${arg_metric}" > "$file"
+    if [ ! -f "$f" ]; then
+      printf "year,month,day,${arg_metric}\n" > "$f"
     fi
 
     if [ "${arg_value}" != "" ]; then
       #printf "arg_value=%s\n" "${arg_value}"
       d=$(date '+%Y,%m,%d')
-      l=$(sed -n "/$d/{=;}" "$file")
-      c="${*//,/-}"
+      l=$(sed -n "/$d/{=;}" "$f")
       if [ -z "$l" ]; then
-        printf "%s,%s\n" "$d" "$c" >> "${file}"
+        printf "%s,%s\n" "$d" "${arg_value}" >> "$f"
       else
-        sed -i"" "$l c $d,$c" "${file}"
+        sed -i"" "$l c $d,${arg_value}" "$f"
       fi
     else
       if [ ${flag_listall} -gt 0 ]; then
