@@ -3,7 +3,7 @@
 _track() {
 # Get basic autocomplete commands from the function itself
   local helplist
-  helplist=$(track shortlist)
+  helplist=$(track -s)
 
 # Combine all the lists for autocomplete
   local cur

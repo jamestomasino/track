@@ -43,6 +43,8 @@ END
 
 arg_metric=""
 arg_value=""
+arg_listnum=""
+arg_remove=""
 flag_options="hvdan:x:s"
 flag_debug=0
 flag_help=0
@@ -135,7 +137,8 @@ main () {
   parse_input "$@"
 
   if [ $flag_shortlist -gt 0 ]; then
-    out="-v -h -d -a -n -x"
+    TRACK_DIR=${TRACK_DIR:-.}
+    out=$(find "$TRACK_DIR"/*.csv -maxdepth 1 2>/dev/null | sed -e 's/.*\///' | sed -e 's/\..*$//')
     die "${out}" 0
   fi
 
