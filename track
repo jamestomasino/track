@@ -25,6 +25,11 @@ show_help () {
   cat > /dev/stdout << END
 track [options] [metric] [value]
 
+DIRECTORY:
+  If the environment variable $TRACK_DIR is set, track will store
+  all data in that location. Otherwise the default is the current
+  working directory.
+
 USAGE:
   track weight 150            Log 150lbs for today's weight
   track -n 10 calories        Show last 10 days calorie values
@@ -158,8 +163,23 @@ main () {
   fi
 
   if [ "${arg_metric}" != "" ]; then
+    file="${TRACK_DIR}/${arg_metric}.csv"
+
+    # If new file, add header
+    if [ ! -f "$file" ]; then
+      printf "year,month,day,${arg_metric}" > "$file"
+    fi
+
     if [ "${arg_value}" != "" ]; then
-      printf "arg_value=%s\n" "${arg_value}"
+      #printf "arg_value=%s\n" "${arg_value}"
+      d=$(date '+%Y,%m,%d')
+      l=$(sed -n "/$d/{=;}" "$file")
+      c="${*//,/-}"
+      if [ -z "$l" ]; then
+        printf "%s,%s\n" "$d" "$c" >> "${file}"
+      else
+        sed -i"" "$l c $d,$c" "${file}"
+      fi
     else
       if [ ${flag_listall} -gt 0 ]; then
         printf "print all values of %s\n" "${arg_metric}"
