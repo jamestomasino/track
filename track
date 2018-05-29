@@ -167,7 +167,7 @@ main () {
 
     # If new file, add header
     if [ ! -f "$f" ]; then
-      printf "year,month,day,${arg_metric}\n" > "$f"
+      printf "year,month,day,%s\n" "${arg_metric}" > "$f"
     fi
 
     if [ "${arg_value}" != "" ]; then
