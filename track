@@ -181,7 +181,7 @@ main () {
       fi
     else
       if [ ${flag_listall} -gt 0 ]; then
-        printf "print all values of %s\n" "${arg_metric}"
+        awk -F "," 'NR>1 {printf "%s-%s-%s\t%s\t\n", $1, $2, $3, $4;}' "$f"
       elif [ ${flag_listnum} -gt 0 ]; then
         printf "print %s values of %s\n" "${arg_listnum}" "${arg_metric}"
       else
