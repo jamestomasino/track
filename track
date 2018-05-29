@@ -167,15 +167,14 @@ main () {
 
     # If new file, add header
     if [ ! -f "$f" ]; then
-      printf "year,month,day,%s\n" "${arg_metric}" > "$f"
+      printf "year,month,day,%s\\n" "${arg_metric}" > "$f"
     fi
 
     if [ "${arg_value}" != "" ]; then
-      #printf "arg_value=%s\n" "${arg_value}"
       d=$(date '+%Y,%m,%d')
       l=$(sed -n "/$d/{=;}" "$f")
       if [ -z "$l" ]; then
-        printf "%s,%s\n" "$d" "${arg_value}" >> "$f"
+        printf "%s,%s\\n" "$d" "${arg_value}" >> "$f"
       else
         sed -i"" "$l c $d,${arg_value}" "$f"
       fi
