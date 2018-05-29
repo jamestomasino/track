@@ -3,7 +3,11 @@ track ![calver](https://img.shields.io/badge/calver-2018.05.29-22bfda.svg?style=
 
 **track** is a minimalistic data manager for the shell.
 
-(in development)
+Using the command line, track allows you to enter one and only one data point
+on any metric per day. It's great for tracking your weight or how many cups of
+coffee you drank. Track logs your data for each given metric to a CSV file. If
+you track the same metric twice in the same day, the data is updated. There's
+a few handy options for printing out the list data in useful formats as well.
 
 ### Install
 
