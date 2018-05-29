@@ -37,10 +37,10 @@ OPTIONS:
   -h                          Show this help
   -v                          Show current version info
   -d                          Debug mode
-
 END
 }
 
+TRACK_DIR=${TRACK_DIR:-.}
 arg_metric=""
 arg_value=""
 arg_listnum=""
@@ -58,26 +58,26 @@ die () {
   msg="$1"
   code="$2"
   # exit code defaults to 1
-  if printf "%s" "$code" | grep -q '^[0-9]+$'; then
+  if printf "%s" "${code}" | grep -q '^[0-9]+$'; then
     code=1
   fi
   # output message to stdout or stderr based on code
-  if [ ! -z "$msg" ]; then
-    if [ "$code" -eq 0 ]; then
-      printf "%s\\n" "$msg"
+  if [ ! -z "${msg}" ]; then
+    if [ "${code}" -eq 0 ]; then
+      printf "%s\\n" "${msg}"
     else
-      printf "%s\\n" "$msg" >&2
+      printf "%s\\n" "${msg}" >&2
     fi
   fi
-  exit "$code"
+  exit "${code}"
 }
 
 parse_input () {
-  if ! parsed=$(getopt $flag_options "$@"); then
+  if ! parsed=$(getopt ${flag_options} "$@"); then
     die "Invalid input" 2
   fi
 
-  eval set -- "$parsed"
+  eval set -- "${parsed}"
 
   while true; do
     case "$1" in
@@ -124,11 +124,11 @@ parse_input () {
   done
 
   for arg in "$@"; do
-    argc=$(printf "%s" "$arg" | tr '[:upper:]' '[:lower:]')
-    if [ "$arg_metric" = "" ]; then
-      arg_metric="$argc"
-    elif [ "$arg_value" = "" ]; then
-      arg_value="$argc"
+    argc=$(printf "%s" "${arg}" | tr '[:upper:]' '[:lower:]')
+    if [ "${arg_metric}" = "" ]; then
+      arg_metric="${argc}"
+    elif [ "${arg_value}" = "" ]; then
+      arg_value="${argc}"
     fi
   done
 }
@@ -136,37 +136,40 @@ parse_input () {
 main () {
   parse_input "$@"
 
-  if [ $flag_shortlist -gt 0 ]; then
-    TRACK_DIR=${TRACK_DIR:-.}
-    out=$(find "$TRACK_DIR"/*.csv -maxdepth 1 2>/dev/null | sed -e 's/.*\///' | sed -e 's/\..*$//')
+  if [ ${flag_shortlist} -gt 0 ]; then
+    out=$(find "${TRACK_DIR}"/*.csv -maxdepth 1 2>/dev/null | sed -e 's/.*\///' | sed -e 's/\..*$//')
     die "${out}" 0
   fi
 
-  if [ $flag_version -gt 0 ]; then
-    printf "%s\\n" "$version"
+  if [ ${flag_version} -gt 0 ]; then
+    printf "%s\\n" "${version}"
   fi
 
-  if [ $flag_help -gt 0 ]; then
+  if [ ${flag_help} -gt 0 ]; then
     show_help
   fi
 
-  if [ $flag_debug -gt 0 ]; then
-    # set -x
-    printf "arg_metric=%s\n" "$arg_metric"
-    printf "arg_value=%s\n" "$arg_value"
-    printf "arg_listnum=%s\n" "$arg_listnum"
-    printf "arg_remove=%s\n" "$arg_remove"
-
-    printf "flag_debug=%s\n" "$flag_debug"
-    printf "flag_help=%s\n" "$flag_help"
-    printf "flag_listall=%s\n" "$flag_listall"
-    printf "flag_listnum=%s\n" "$flag_listnum"
-    printf "flag_remove=%s\n" "$flag_remove"
-    printf "flag_version=%s\n" "$flag_version"
-    printf "flag_shortlist=%s\n" "$flag_shortlist"
+  if [ ${flag_debug} -gt 0 ]; then
+    set -x
   fi
 
+  if [ ${flag_remove} -gt 0 ]; then
+    rm "${TRACK_DIR}/${arg_remove}"
+  fi
 
+  if [ "${arg_metric}" != "" ]; then
+    if [ "${arg_value}" != "" ]; then
+      printf "arg_value=%s\n" "${arg_value}"
+    else
+      if [ ${flag_listall} -gt 0 ]; then
+        printf "print all values of %s\n" "${arg_metric}"
+      elif [ ${flag_listnum} -gt 0 ]; then
+        printf "print %s values of %s\n" "${arg_listnum}" "${arg_metric}"
+      else
+        printf "print current value of %s\n" "${arg_metric}"
+      fi
+    fi
+  fi
 }
 
 main "$@"
