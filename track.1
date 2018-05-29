@@ -1,9 +1,49 @@
-.TH TRACK 1
+.TH TRACK 1 "29 May 2018" "v2018.05.29"
 .SH NAME
 track \- a minimalistic data tracker
+.SH SYNOPSIS
+.B track [options] [metric] [value]
 .SH DESRIPTION
-.B track
-is under heavy development.
+Using the command line, 
+.B track 
+allows you to enter one and only one data point on any metric per day. It's
+great for tracking your weight or how many cups of coffee you drank.
+.B track 
+logs your data for each given metric to a CSV file. If you track the same
+metric twice in the same day, the data is updated. There's a few handy options
+for printing out the list data in useful formats as well.
+.SH USAGE
+.TP
+.B track weight 150
+Log 150lbs for today's weight
+.TP
+.B track -n 10 calories
+Show last 10 days calorie values
+.TP
+.B track mood
+Show last value logged for mood
 .SH DEPENDENCIES
 None.
-
+.SH OPTIONS
+.TP
+.B -a
+Show all values of a metric
+.TP
+.B -n <N>
+Show N values of a metric
+.TP
+.B -x <metric>
+Remove metric file
+.TP
+.B -v
+Display current version information.
+.TP
+.B -d
+Debug mode.
+.TP 
+.B -h
+Show the help.
+.SH BUGS
+None known.
+.SH AUTHOR
+James Tomasino <tomasino (at) lavabit (dot) com>
