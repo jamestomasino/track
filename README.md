@@ -1,4 +1,4 @@
-track ![status](https://img.shields.io/badge/status-working-green.svg?style=flat-square) ![license](https://img.shields.io/badge/license-GPL3-blue.svg?style=flat-square)
+track ![calver](https://img.shields.io/badge/calver-2018.05.29-22bfda.svg?style=flat-square) ![status](https://img.shields.io/badge/status-working-green.svg?style=flat-square) ![license](https://img.shields.io/badge/license-GPL3-blue.svg?style=flat-square)
 ------
 
 **track** is a minimalistic data manager for the shell.
