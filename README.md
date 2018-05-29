@@ -26,7 +26,7 @@ git repo, but will lack `man` support and command completion._
 track [options] [metric] [value]
 
 DIRECTORY:
-  If the environment variable $TODO_DIR is set, track will store all data in
+  If the environment variable $TRACK_DIR is set, track will store all data in
   that location. Otherwise the default is the current working directory.
 
 USAGE:
