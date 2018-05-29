@@ -26,7 +26,7 @@ show_help () {
 track [options] [metric] [value]
 
 DIRECTORY:
-  If the environment variable $TRACK_DIR is set, track will store
+  If the environment variable \$TRACK_DIR is set, track will store
   all data in that location. Otherwise the default is the current
   working directory.
 

@@ -26,9 +26,8 @@ git repo, but will lack `man` support and command completion._
 track [options] [metric] [value]
 
 DIRECTORY:
-  If the environment variable /home/tomasino/.dropbox/Dropbox/track is set,
-  track will store all data in that location. Otherwise the default is the
-  current working directory.
+  If the environment variable $TODO_DIR is set, track will store all data in
+  that location. Otherwise the default is the current working directory.
 
 USAGE:
   track weight 150            Log 150lbs for today's weight
