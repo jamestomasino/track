@@ -39,6 +39,7 @@ OPTIONS:
   -a                          Show all values of metric
   -n N                        Show N values of metric
   -x                          Remove metric file
+  -c                          Output CSV
   -h                          Show this help
   -v                          Show current version info
   -d                          Debug mode
@@ -50,7 +51,7 @@ arg_metric=""
 arg_value=""
 arg_listnum=""
 arg_remove=""
-flag_options="hvdan:x:s"
+flag_options="hvdan:x:sc"
 flag_debug=0
 flag_help=0
 flag_listall=0
@@ -58,6 +59,7 @@ flag_listnum=0
 flag_remove=0
 flag_version=0
 flag_shortlist=0
+flag_csv=0
 
 die () {
   msg="$1"
@@ -116,6 +118,10 @@ parse_input () {
         ;;
       -s)
         flag_shortlist=1
+        shift
+        ;;
+      -c)
+        flag_csv=1
         shift
         ;;
       --)
@@ -180,11 +186,23 @@ main () {
       fi
     else
       if [ ${flag_listall} -gt 0 ]; then
-        awk -F "," 'NR>1 {printf "%s-%s-%s\t%s\t\n", $1, $2, $3, $4;}' "$f"
+        if [ ${flag_csv} -gt 0 ]; then
+          awk -F "," 'NR>1 {printf "%s-%s-%s,%s\n", $1, $2, $3, $4;}' "$f"
+        else
+          awk -F "," 'NR>1 {printf "%s-%s-%s\t%s\n", $1, $2, $3, $4;}' "$f"
+        fi
       elif [ ${flag_listnum} -gt 0 ]; then
-        tail -n "${arg_listnum}" "$f" | awk -F "," '{printf "%s-%s-%s\t%s\t\n", $1, $2, $3, $4;}'
+        if [ ${flag_csv} -gt 0 ]; then
+          tail -n "${arg_listnum}" "$f" | awk -F "," '{printf "%s-%s-%s,%s\n", $1, $2, $3, $4;}'
+        else
+          tail -n "${arg_listnum}" "$f" | awk -F "," '{printf "%s-%s-%s\t%s\n", $1, $2, $3, $4;}'
+        fi
       else
-        tail -n 1 "$f" | awk -F "," '{printf "%s-%s-%s\t%s\t\n", $1, $2, $3, $4;}'
+        if [ ${flag_csv} -gt 0 ]; then
+          tail -n 1 "$f" | awk -F "," '{printf "%s-%s-%s,%s\n", $1, $2, $3, $4;}'
+        else
+          tail -n 1 "$f" | awk -F "," '{printf "%s-%s-%s\t%s\n", $1, $2, $3, $4;}'
+        fi
       fi
     fi
   fi
