@@ -187,9 +187,9 @@ main () {
     else
       if [ ${flag_listall} -gt 0 ]; then
         if [ ${flag_csv} -gt 0 ]; then
-          awk -F "," 'NR>1 {printf "%s-%s-%s,%s\n", $1, $2, $3, $4;}' "$f"
+          awk -F "," '{printf "%s-%s-%s,%s\n", $1, $2, $3, $4;}' "$f"
         else
-          awk -F "," 'NR>1 {printf "%s-%s-%s\t%s\n", $1, $2, $3, $4;}' "$f"
+          awk -F "," '{printf "%s-%s-%s\t%s\n", $1, $2, $3, $4;}' "$f"
         fi
       elif [ ${flag_listnum} -gt 0 ]; then
         if [ ${flag_csv} -gt 0 ]; then
