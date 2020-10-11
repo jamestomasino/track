@@ -1,46 +1,32 @@
-PREFIX ?= /usr/local
-BINDIR ?= $(PREFIX)/bin
-MANDIR ?= $(PREFIX)/share/man
+# Install to /usr/local unless otherwise specified, such as `make PREFIX=/app`
+PREFIX?=/usr/local
 
-# Attempt to find bash completion dir in order of preference
-ifneq ($(wildcard /etc/bash_completion.d/.),)
-  CPLDIR ?= /etc/bash_completion.d
-endif
+# What to run to install various files
+INSTALL?=install
+# Run to install the actual binary
+INSTALL_PROGRAM=$(INSTALL) -Dm 755
+# Run to install application data, with differing permissions
+INSTALL_DATA=$(INSTALL) -Dm 644
 
-HAS_BREW := $(shell command -v brew 2> /dev/null)
-ifdef HAS_BREW
-  CPLDIR ?= $$(brew --prefix)/etc/bash_completion.d
-endif
+# Directories into which to install the various files
+bindir=$(DESTDIR)$(PREFIX)/bin
+sharedir=$(DESTDIR)$(PREFIX)/share
 
-HAS_PKGCONFIG := $(shell command -v pkg-config 2> /dev/null)
-ifdef HAS_PKGCONFIG
-  CPLDIR ?= $$(pkg-config --variable=completionsdir bash-completion 2> /dev/null)
-endif
+help:
+	@echo "targets:"
+	@awk -F '#' '/^[a-zA-Z0-9_-\.]+:.*?#/ { print $0 }' $(MAKEFILE_LIST) \
+	| sed -n 's/^\(.*\): \(.*\)#\(.*\)/  \1|-\3/p' \
+	| column -t  -s '|'
 
-install:
-	@echo Installing the executable to $(BINDIR)
-	@mkdir -p $(BINDIR)
-	@cp -f track $(BINDIR)/track
-	@chmod 755 $(BINDIR)/track
-	@echo Installing the manual page to $(MANDIR)/man1
-	@mkdir -p $(MANDIR)
-	@cp -f track.1 $(MANDIR)/man1/track.1
-	@chmod 644 $(MANDIR)/man1/track.1
-ifdef CPLDIR
-	@echo Installing the command completion to $(CPLDIR)
-	@mkdir -p $(CPLDIR)
-	@cp -f track.d $(CPLDIR)/track
-	@chmod 644 $(CPLDIR)/track
-endif
+install: track track.1 # system install
+	$(INSTALL_PROGRAM) track $(bindir)/track
+	$(INSTALL_DATA) track.1 $(sharedir)/man/man1/track.1
 
-uninstall:
-	@echo Removing the executable from $(BINDIR)
-	@rm -f $(BINDIR)/track
-	@echo Removing the manual page from $(MANDIR)/man1
-	@rm -f $(BINDIR)/man1/track.1
-ifdef CPLDIR
-	@echo Removing the command completion from $(CPLDIR)
-	@rm -f $(CPLDIR)/track
-endif
+uninstall: # system uninstall
+	rm -f $(bindir)/track
+	rm -f $(sharedir)/man/man1/track.1
 
-.PHONY: install uninstall
+README.txt: track.1 # generate readme file
+	man ./track.1 | col -bx > README.txt
+
+.PHONY: help install uninstall

@@ -2,7 +2,7 @@
 
 # This file defines track - a minimalist data tracker
 
-# Copyright (C) 2018 tomasino@sdf.org
+# Copyright (C) 2020 James Tomasino
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,11 @@
 
 #-----------------------------------------------------------------------
 
-version="2018.05.29"
+version="2020.10.11"
 
 show_help () {
   cat > /dev/stdout << END
-track [options] [metric] [value]
+track [options...] <metric> [<value>]
 
 DIRECTORY:
   If the environment variable \$TRACK_DIR is set, track will store
@@ -40,18 +40,24 @@ OPTIONS:
   -n N                        Show N values of metric
   -x                          Remove metric file
   -c                          Output CSV
+  -l                          List metrics being tracked
   -h                          Show this help
   -v                          Show current version info
   -d                          Debug mode
 END
 }
 
+# Determine tracking directory and ensure it is a directory
 TRACK_DIR=${TRACK_DIR:-.}
+if [ -f "$TRACK_DIR" ]; then
+  TRACK_DIR="$(dirname ${TRACK_DIR})"
+fi
+
 arg_metric=""
 arg_value=""
 arg_listnum=""
 arg_remove=""
-flag_options="hvdan:x:sc"
+flag_options="hvdan:x:lc"
 flag_debug=0
 flag_help=0
 flag_listall=0
@@ -61,27 +67,10 @@ flag_version=0
 flag_shortlist=0
 flag_csv=0
 
-die () {
-  msg="$1"
-  code="$2"
-  # exit code defaults to 1
-  if printf "%s" "${code}" | grep -q '^[0-9]+$'; then
-    code=1
-  fi
-  # output message to stdout or stderr based on code
-  if [ ! -z "${msg}" ]; then
-    if [ "${code}" -eq 0 ]; then
-      printf "%s\\n" "${msg}"
-    else
-      printf "%s\\n" "${msg}" >&2
-    fi
-  fi
-  exit "${code}"
-}
-
 parse_input () {
   if ! parsed=$(getopt ${flag_options} "$@"); then
-    die "Invalid input" 2
+    printf "Invalid input\\n" >&2
+    exit 2
   fi
 
   eval set -- "${parsed}"
@@ -116,7 +105,7 @@ parse_input () {
         arg_remove="$1"
         shift
         ;;
-      -s)
+      -l)
         flag_shortlist=1
         shift
         ;;
@@ -129,17 +118,19 @@ parse_input () {
         break
         ;;
       *)
-        die "Internal error: $1" 3
+        printf "Internal error: %s\\n" "$1" >&2
+        exit 3
         ;;
     esac
   done
 
-  for arg in "$@"; do
-    argc=$(printf "%s" "${arg}" | tr '[:upper:]' '[:lower:]')
-    if [ "${arg_metric}" = "" ]; then
-      arg_metric="${argc}"
-    elif [ "${arg_value}" = "" ]; then
-      arg_value="${argc}"
+  while [ "$#" -gt 0 ]; do
+    if [ -z "${arg_metric}" ]; then
+      arg_metric="$(printf "%s" "${1}" | tr '[:upper:]' '[:lower:]')"
+      shift
+    else [ -z "${arg_value}" ]
+      arg_value="$*"
+      break
     fi
   done
 }
@@ -149,15 +140,18 @@ main () {
 
   if [ ${flag_shortlist} -gt 0 ]; then
     out=$(find "${TRACK_DIR}"/*.csv -maxdepth 1 2>/dev/null | sed -e 's/.*\///' | sed -e 's/\..*$//')
-    die "${out}" 0
+    printf "%s\\n" "${out}"
+    exit 0
   fi
 
   if [ ${flag_version} -gt 0 ]; then
     printf "%s\\n" "${version}"
+    exit 0
   fi
 
   if [ ${flag_help} -gt 0 ]; then
     show_help
+    exit 0
   fi
 
   if [ ${flag_debug} -gt 0 ]; then
@@ -177,7 +171,7 @@ main () {
     fi
 
     if [ "${arg_value}" != "" ]; then
-      d=$(date '+%Y,%m,%d')
+      d=$(date '+%Y,%0m,%0d')
       l=$(sed -n "/$d/{=;}" "$f")
       if [ -z "$l" ]; then
         printf "%s,%s\\n" "$d" "${arg_value}" >> "$f"
@@ -187,21 +181,21 @@ main () {
     else
       if [ ${flag_listall} -gt 0 ]; then
         if [ ${flag_csv} -gt 0 ]; then
-          awk -F "," '{printf "%s-%s-%s,%s\n", $1, $2, $3, $4;}' "$f"
+          awk -F "," '{printf "%02d-%02d-%02d,%s\n", $1, $2, $3, $4;}' "$f"
         else
-          awk -F "," '{printf "%s-%s-%s\t%s\n", $1, $2, $3, $4;}' "$f"
+          awk -F "," '{printf "%02d-%02d-%02d\t%s\n", $1, $2, $3, $4;}' "$f"
         fi
       elif [ ${flag_listnum} -gt 0 ]; then
         if [ ${flag_csv} -gt 0 ]; then
-          tail -n "${arg_listnum}" "$f" | awk -F "," '{printf "%s-%s-%s,%s\n", $1, $2, $3, $4;}'
+          tail -n "${arg_listnum}" "$f" | awk -F "," '{printf "%02d-%02d-%02d,%s\n", $1, $2, $3, $4;}'
         else
-          tail -n "${arg_listnum}" "$f" | awk -F "," '{printf "%s-%s-%s\t%s\n", $1, $2, $3, $4;}'
+          tail -n "${arg_listnum}" "$f" | awk -F "," '{printf "%02d-%02d-%02d\t%s\n", $1, $2, $3, $4;}'
         fi
       else
         if [ ${flag_csv} -gt 0 ]; then
-          tail -n 1 "$f" | awk -F "," '{printf "%s-%s-%s,%s\n", $1, $2, $3, $4;}'
+          tail -n 1 "$f" | awk -F "," '{printf "%02d-%02d-%02d,%s\n", $1, $2, $3, $4;}'
         else
-          tail -n 1 "$f" | awk -F "," '{printf "%s-%s-%s\t%s\n", $1, $2, $3, $4;}'
+          tail -n 1 "$f" | awk -F "," '{printf "%02d-%02d-%02d\t%s\n", $1, $2, $3, $4;}'
         fi
       fi
     fi

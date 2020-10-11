@@ -1,13 +1,12 @@
-.TH TRACK 1 "29 May 2018" "v2018.05.29"
+.TH TRACK 1 "11 Oct 2020" "v2020.10.11"
+
 .SH NAME
 track \- a minimalistic data tracker
+
 .SH SYNOPSIS
-.B track [options] [metric] [value]
+.B track [options] <metric> [<value>]
 .P
-Setting the
-.B $TRACK_DIR
-environment variable will change the default location where the data is stored.
-If it is not set the current directory is used.
+
 .SH DESRIPTION
 Using the command line, 
 .B track 
@@ -15,21 +14,13 @@ allows you to enter one and only one data point on any metric per day. It's
 great for tracking your weight or how many cups of coffee you drank.
 .B track 
 logs your data for each given metric to a CSV file. If you track the same
-metric twice in the same day, the data is updated. There's a few handy options
-for printing out the list data in useful formats as well.
-.SH USAGE
-.TP
-.B track weight 150
-Log 150lbs for today's weight
-.TP
-.B track -n 10 calories
-Show last 10 days calorie values
-.TP
-.B track mood
-Show last value logged for mood
-.SH DEPENDENCIES
-None.
+metric twice in the same day, the data is updated. Data need not be numeric.
+
 .SH OPTIONS
+Setting the
+.B $TRACK_DIR
+environment variable will change the default location where the data is stored.
+If it is not set the current directory is used.
 .TP
 .B -a
 Show all values of a metric
@@ -40,15 +31,43 @@ Show N values of a metric
 .B -x <metric>
 Remove metric file
 .TP
+.B -c
+Output in CSV format
+.TP
+.B -l
+List all metrics being tracked
+.TP
+.B -h
+Show the help.
+.TP
 .B -v
 Display current version information.
 .TP
 .B -d
 Debug mode.
-.TP 
-.B -h
-Show the help.
+
+.SH EXAMPLES
+.TP
+.B track weight 150
+Log 150lbs for today's weight
+.TP
+.B track -n 10 calories
+Show last 10 days calorie values
+.TP
+.B track mood `tired and hungry'
+Show last value logged for mood
+.TP
+.B track mood
+Show last value logged for mood
+
+.SH LICENSE
+GNU General Public License v3.0 or later at
+.TP
+.B https://www.gnu.org/licenses/gpl-3.0-standalone.html
+
 .SH BUGS
-None known.
+Report issues at the git repository at
+.B https://github.com/jamestomasino/track
+
 .SH AUTHOR
-James Tomasino <tomasino (at) lavabit (dot) com>
+James Tomasino <james (at) tomasino (dot) org>
